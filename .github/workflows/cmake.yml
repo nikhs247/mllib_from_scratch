@@ -1,0 +1,28 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Check out your code
+    - uses: actions/checkout@v3
+
+    # 2. Configure CMake (This downloads GTest too)
+    - name: Configure CMake
+      run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+
+    # 3. Build the code
+    - name: Build
+      run: cmake --build build --config Release
+
+    # 4. Run Tests
+    - name: Test
+      working-directory: ${{github.workspace}}/build
+      run: ctest -C Release --output-on-failure
