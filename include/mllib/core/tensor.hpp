@@ -68,9 +68,60 @@ namespace mllib {
                 }
 
                 // ND Access
-                T& at(const std::vector<size_t>& indices) {
+                T& at(const std::vector<size_t>& indices){
                     size_t flat_index = calculate_flat_index(indices);
                     return m_data[flat_index];
+                }
+
+                const T& at(const std::vector<size_t>& indices) const{
+                    size_t flat_index = calculate_flat_index(indices);
+                    return m_data[flat_index];
+                }
+
+                // Element wise addition
+                Tensor<T> operator+(const Tensor<T>& other) const {
+                    if(m_shape != other.m_shape){
+                        throw std::invalid_argument("Tensor shapes do not match for addition.");
+                    }
+
+                    Tensor<T> result(m_shape);
+
+                    for(size_t i = 0; i < m_data.size(); i++) {
+                        result.m_data[i] = m_data[i] + other.m_data[i];
+                    }
+
+                    return result;
+                }
+
+                // Matrix multiplication
+                Tensor<T> matmul(const Tensor<T>& other) const {
+                    if(m_shape.size() != 2 || other.m_shape.size() != 2) {
+                        throw std::invalid_argument("Both tensors must be 2D for matrix multiplication.");
+                    }
+                    if(m_shape[1] != other.m_shape[0]) {
+                        throw std::invalid_argument("Inner dimensions do not match for matrix multiplication.");
+                    }
+
+                    // rows x inner_dim, inner_dim x cols => rows x cols
+                    size_t rows = m_shape[0];
+                    size_t cols = other.m_shape[1];
+                    size_t inner_dim = m_shape[1];
+
+                    // Intialize result tensor
+                    // TODO: Optimize with better memory management
+                    Tensor<T> result({rows, cols}, static_cast<T>(0));
+                    for(size_t i = 0; i < rows; i++) {
+                        for(size_t k = 0; k < inner_dim; k++) {
+                            T val_A = this->at({i, k});
+                            for(size_t j = 0; j < cols; j++) {
+                                T val_B = other.at({k, j});
+                                result.at({i, j}) += val_A * val_B;
+                            }
+                        }
+                    }
+
+                    return result;
+
                 }
 
             private:

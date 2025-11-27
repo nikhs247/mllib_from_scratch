@@ -30,3 +30,36 @@ TEST(TensorTest, OutOfBounds) {
     // Throws exception as 3 dimesnions are provided for a 2D tensor
     EXPECT_THROW(t.at({0, 1, 2}), std::out_of_range);
 }
+
+// Test Case 4: Tensor Addition
+TEST(TensorTest, Addition) {
+    mllib::core::Tensor<int> a({2, 2}, 1);
+    mllib::core::Tensor<int> b({2, 2}, 2);
+    mllib::core::Tensor<int> c = a + b;
+    EXPECT_EQ(c.at({0, 0}), 3);
+    EXPECT_EQ(c.at({1, 1}), 3);
+}
+
+// Test Case 5: Matrix Multiplication
+TEST(TensorTest, MatMul) {
+    // Matrix A (2x2)
+    mllib::core::Tensor<float> A({2, 2});
+    A.at({0, 0}) = 1; A.at({0, 1}) = 2;
+    A.at({1, 0}) = 3; A.at({1, 1}) = 4;
+
+    // Matrix B (2x2)
+    mllib::core::Tensor<float> B({2, 2});
+    B.at({0, 0}) = 2; B.at({0, 1}) = 0;
+    B.at({1, 0}) = 1; B.at({1, 1}) = 2;
+
+    // Resultant Matrix C = A * B
+    mllib::core::Tensor<float> C = A.matmul(B);
+
+    EXPECT_EQ(C.shape()[0], 2);
+    EXPECT_EQ(C.shape()[1], 2);
+
+    EXPECT_FLOAT_EQ(C.at({0, 0}), 4);  // 1*2 + 2*1
+    EXPECT_FLOAT_EQ(C.at({0, 1}), 4);  // 1*0 + 2*2
+    EXPECT_FLOAT_EQ(C.at({1, 0}), 10); // 3*2 + 4*1
+    EXPECT_FLOAT_EQ(C.at({1, 1}), 8);  // 3*0 + 4*2
+}

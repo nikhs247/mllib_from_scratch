@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # 1. Check out your code
+    # 1. Check out code
     - uses: actions/checkout@v3
 
     # 2. Configure CMake (This downloads GTest too)
